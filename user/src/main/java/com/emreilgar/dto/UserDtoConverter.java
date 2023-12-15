@@ -1,17 +1,29 @@
-package org.example.dto;
-
-import org.example.model.User;
-import org.example.model.UserInformation;
+package com.emreilgar.dto;
+import com.emreilgar.model.Users;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDtoConverter {
+    private final UserDetailDtoConverter converter;
 
-//    public UserDto convert(User from){
-//        return new UserDto(from.getMail(),from.getFirstName(), from.getLastName(), from.getMiddleName());
-//    }
+    public UserDtoConverter(UserDetailDtoConverter converter) {
+        this.converter = converter;
+    }
 
-    public UserDto convert(UserInformation from){
-        return new UserDto(from.getMail(),from.getFirstName(),from.getLastName(),from.getMiddleName());
+    public UserDto convert(Users from) {
+        return new UserDto(
+                from.getMail(),
+                from.getFirstName(),
+                from.getLastName(),
+                from.getMiddleName()
+        );
+    }
+
+    public List<UserDto> convert(List<Users> fromList) {
+
+        return fromList.stream().map(this::convert).collect(Collectors.toList());
     }
 }

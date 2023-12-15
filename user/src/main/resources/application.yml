@@ -1,0 +1,31 @@
+server:
+  port: 8888
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/e-ticaretDB
+    username: postgres
+    password: root
+    hikari:
+      auto-commit: false
+  #  datasource:
+  #    url: jdbc:h2:mem:mydb
+  #    username: sa
+  #    password: 123
+  #    driverClassName: org.h2.Driver
+  #    jpa:
+  #      spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+  #  h2:
+  #    console.enabled: true
+  main:
+    allow-circular-references: false
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

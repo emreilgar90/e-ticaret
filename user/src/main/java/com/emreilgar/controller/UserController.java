@@ -1,11 +1,8 @@
-package org.example.controller;
+package com.emreilgar.controller;
 
 
-import org.example.dto.CreateUserRequest;
-import org.example.dto.UpdateUserRequest;
-import org.example.dto.UserDto;
-
-import org.example.service.UserService;
+import com.emreilgar.dto.*;
+import com.emreilgar.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,16 +28,20 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByMail(mail));
     }
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequest userRequest){
+    public ResponseEntity<UserDto> createUser(@RequestBody CreateUserRequestDto userRequest){
         return ResponseEntity.ok(userService.createUser(userRequest));
     }
     @PutMapping("/{mail}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable String mail,@RequestBody UpdateUserRequest updateUserRequest){
+    public ResponseEntity<UserDto> updateUser(@PathVariable String mail,@RequestBody UpdateUserRequestDto updateUserRequest){
         return ResponseEntity.ok(userService.updateUser(mail, updateUserRequest));
     }
     @PatchMapping("/{id}") //belirli alanı güncelleme
     public ResponseEntity<Void>deactivateUser(@PathVariable Long id){
         userService.deactivateUser(id);
+        return ResponseEntity.ok().build();
+    }
+    public ResponseEntity<Void>activeUser(@PathVariable Long id){
+        userService.activateUser(id);
         return ResponseEntity.ok().build();
     }
     @DeleteMapping("/{id}")

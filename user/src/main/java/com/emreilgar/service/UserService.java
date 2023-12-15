@@ -1,84 +1,107 @@
-package org.example.service;
+package com.emreilgar.service;
 
-import org.example.dto.CreateUserRequest;
-import org.example.dto.UpdateUserRequest;
-import org.example.dto.UserDto;
-import org.example.dto.UserDtoConverter;
-import org.example.exception.ErrorType;
-import org.example.exception.UserManagerException;
-import org.example.model.UserInformation;
-import org.example.repository.UserInformationRepository;
+import com.emreilgar.dto.CreateUserRequestDto;
+import com.emreilgar.dto.UpdateUserRequestDto;
+import com.emreilgar.dto.UserDto;
+import com.emreilgar.dto.UserDtoConverter;
+import com.emreilgar.exception.*;
+import com.emreilgar.model.Users;
+
+import com.emreilgar.repository.UsersRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.stream.Collectors;
+
 @Service
 public class UserService {
-    private final UserInformationRepository userInformationRepository;
+    private static final Logger logger= LoggerFactory.getLogger(UserService.class);
+    private final UsersRepository usersRepository;
     private final UserDtoConverter userDtoConverter;
 
-    public UserService(UserInformationRepository userInformationRepository, UserDtoConverter userDtoConverter) {
-        this.userInformationRepository = userInformationRepository;
+    public UserService(UsersRepository usersRepository, UserDtoConverter userDtoConverter) {
+        this.usersRepository = usersRepository;
         this.userDtoConverter = userDtoConverter;
     }
 
-    public List<UserDto> getAllUsers() {
-        return userInformationRepository.findAll().stream().map(userDtoConverter::convert).collect(Collectors.toList());
+    public List<UserDto> getAllUsers() { //1+
+        return userDtoConverter.convert(usersRepository.findAll());
     }
 
-    public UserDto getUserByMail(String mail) {
-        UserInformation userInformation = findUserByMail(mail);
-        return userDtoConverter.convert(userInformation);
+    public UserDto getUserByMail(final String mail) {//2++
+        Users users = findUserByMail(mail);
+        return userDtoConverter.convert(users);
     }
 
-    public UserDto createUser(CreateUserRequest userRequest) {
-        UserInformation userInformation = new UserInformation(userRequest.getMail(),
-                userRequest.getFirstName(),
-                userRequest.getLastName(),
-                userRequest.getMiddleName(),
-                false);
-        return userDtoConverter.convert(userInformationRepository.save(userInformation));
+    public UserDto createUser(final CreateUserRequestDto dto) {//3+
+        Users users = new Users();
+        users.setMail(dto.getMail());
+        users.setFirstName(dto.getFirstName());
+        users.setLastName(dto.getLastName());
+        users.setMiddleName(dto.getMiddleName());
+        users.setIsActive(false);
+        return userDtoConverter.convert(usersRepository.save(users));
     }
 
-    public UserDto updateUser(String mail, UpdateUserRequest updateUserRequest) {
-        UserInformation userInformation = findUserByMail(mail);
-        if(!userInformation.getIsActive()){
-            throw new UserManagerException(ErrorType.USER_NOT_ACTIVE);
-        }
-        UserInformation updatedUserInformation = new UserInformation(userInformation.getId(),userInformation.getMail(),
-                updateUserRequest.getFirstName(),
-                updateUserRequest.getLastName(),
-                updateUserRequest.getMiddleName());
-        return userDtoConverter.convert(userInformationRepository.save(updatedUserInformation));
-    }
-    public void deactivateUser(Long id) {
-        UserInformation userInformation= findUserById(id);
-        UserInformation updatedUserInformation = new UserInformation(userInformation.getId(),userInformation.getMail(),
-                userInformation.getFirstName(),
-                userInformation.getLastName(),
-                userInformation.getMiddleName(),
-                false);
-        userInformationRepository.save(updatedUserInformation);
-
-    }
-
-    public void deleteUser(Long id) {
-        if(doesUserExist(id)){
-            userInformationRepository.deleteById(id);
-        }else {
-            throw new UserManagerException(ErrorType.USER_NOT_FOUND);
+    public UserDto updateUser(final String mail, final UpdateUserRequestDto updateUserRequest) { //4++
+        try {
+            Users users = findUserByMail(mail);
+            if (!users.getIsActive()) {
+                throw new UserIsNotActiveException(ErrorType.USER_NOT_ACTIVE, "Kullanıcı Aktif Değil !");
+            }
+            users.setFirstName(updateUserRequest.getFirstName());
+            users.setLastName(updateUserRequest.getLastName());
+            users.setMiddleName(updateUserRequest.getMiddleName());
+            usersRepository.save(users);
+            return userDtoConverter.convert(users);
+        } catch (UserIsNotActiveException ex) {
+            ex.printStackTrace(); // Hata izleme
+            return null; // Veya başka bir geri dönüş yapma işlemi
         }
     }
 
+    public Users deactivateUser(final Long id) throws UserNotFoundException{ //5++
+        {
+            Users users = findUserById(id);
+
+            Users updatedUsers = new Users(
+                    users.getId(),
+                    users.getMail(),
+                    users.getFirstName(),
+                    users.getLastName(),
+                    users.getMiddleName(),
+                    false
+            );
+            usersRepository.save(updatedUsers);
+            return updatedUsers;
+        }
+    }
+    public void activateUser(final Long id) { //6++
+        Users users = findUserById(id);
+        users.setIsActive(true);
+        usersRepository.save(users);
+
+    }
+
+    public void deleteUser(final Long id) { //7++
+        findUserById(id);
+        usersRepository.deleteById(id);
+
+    }
     /********************************************************/
-    private UserInformation findUserByMail(String mail) {
-        return userInformationRepository.findByMail(mail)
+    private Users findUserByMail(final String mail) {
+        return usersRepository.findByMail(mail)
                 .orElseThrow(() ->new UserManagerException(ErrorType.NO_ACCOUNT_FOUND_FOR_EMAIL));
     }
-    private UserInformation findUserById(Long id) {
-        return userInformationRepository.findById(id)
-                .orElseThrow(() ->new UserManagerException(ErrorType.NO_ACCOUNT_FOUND_FOR_EMAIL));
+    protected Users findUserById(final Long id) {
+        return usersRepository.findById(id)
+                .orElseThrow(() ->new UserNotFoundException(ErrorType.NO_ACCOUNT_FOUND_FOR_ID));
     }
-    private boolean doesUserExist(Long id){
-        return userInformationRepository.existsById(id);
+    private boolean doesUserExist(final Long id){
+        return usersRepository.existsById(id);
     }
+
+
+
 }

@@ -1,4 +1,4 @@
-package org.example.exception;
+package com.emreilgar.exception;
 
 import lombok.Getter;
 

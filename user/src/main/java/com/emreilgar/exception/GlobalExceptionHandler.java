@@ -1,4 +1,4 @@
-package org.example.exception;
+package com.emreilgar.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,7 +15,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.example.exception.ErrorType.*;
+import static com.emreilgar.exception.ErrorType.*;
 
 
 @ControllerAdvice

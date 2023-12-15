@@ -1,4 +1,4 @@
-package org.example.model
+package com.emreilgar.model
 import java.time.LocalDateTime
 
 data class BaseEntity(

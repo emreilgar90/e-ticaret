@@ -1,4 +1,4 @@
-package org.example.exception;
+package com.emreilgar.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,13 +17,16 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
         BAD_REQUEST(4100,"Parametre Hatası",HttpStatus.BAD_REQUEST),
         USER_MANAGER_EXCEPTION(4110,"Kullanıcı adı kayıtlı !" ,HttpStatus.BAD_REQUEST),
         USER_NOT_FOUND(4111,"Kullanıcı bulunamadı" ,HttpStatus.BAD_REQUEST),
-        USER_NOT_ACTIVE(4111,"Kullanıcı Aktif değil" ,HttpStatus.BAD_REQUEST),
-        NO_ACCOUNT_FOUND_FOR_EMAIL(4112,"Mail adresiyle ilişkili hesap yok !", HttpStatus.BAD_REQUEST),
+        USER_DETAILS_NOT_FOUND(4112,"Kullanıcının Detayı Bulunamadı !" ,HttpStatus.BAD_REQUEST),
+        USER_NOT_ACTIVE(4113,"Kullanıcı Aktif değil" ,HttpStatus.BAD_REQUEST),
+        NO_ACCOUNT_FOUND_FOR_EMAIL(4114,"Mail adresiyle ilişkili hesap yok !", HttpStatus.BAD_REQUEST),
+        NO_ACCOUNT_FOUND_FOR_ID(4115,"Id ile ilişkili hesap yok !", HttpStatus.BAD_REQUEST),
         INTERNAL_ERROR(5100,"Sunucuda beklenmeyen hata oluştu",HttpStatus.INTERNAL_SERVER_ERROR);
 
         int code;
     String message;
     HttpStatus httpStatus;
+
 
 
 }
